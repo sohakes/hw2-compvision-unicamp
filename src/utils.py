@@ -30,13 +30,14 @@ def debug(name,img):
 
 def create_gaussian_mask(size, sigma):
     assert size % 2 == 1, "mask should have odd size"
-    def pixel_val(x, y):
-        #return np.exp(-(X.^2 + Y.^2) / (2*sigma*sigma));
-        return (1.0/(2 * math.pi * sigma ** 2)) * math.e**(-(x**2 + y**2)/(2*sigma**2))
+    def pixel_val(x):
+        exp = math.e**(-(x**2)/(2*(sigma**2)))
+        return ((1.0 * exp) /(math.sqrt(2 * math.pi) * sigma))
 
-    halfsize = math.floor(size / 2)
+    halfsize_i = math.floor(size / 2)
 
-    mask = np.array([[pixel_val(i, j) for i in range(-halfsize, halfsize + 1)] for j in range(-halfsize, halfsize + 1)])
+    mask = np.array([pixel_val(i) for i in range(-halfsize_i, halfsize_i + 1)])
+    print(mask)
     msum = np.sum(mask)
 
     return mask / msum
