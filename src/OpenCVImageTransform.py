@@ -38,34 +38,41 @@ class OpenCVImageTransform:
         #plt.imshow(img3),plt.show()
         return ((kp1, des1), (kp2, des2), good)
 
-    def show_matched(self):
-        ((kp1, des1), (kp2, des2), good) = self._match(self.img1, self.img2)
+    def show_matched(self, img2, img1):
+        img1 = cv2.copyMakeBorder(img1, 100, 100, 100, 100, cv2.BORDER_CONSTANT, 0)
+        img2 = cv2.copyMakeBorder(img2, 100, 100, 100, 100, cv2.BORDER_CONSTANT, 0)
+        ((kp1, des1), (kp2, des2), good) = self._match(img1, img2)
         #print(kp1, des1, good)
         if len(good)>8:
-            src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
-            dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+            dst_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+            src_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             #matchesMask = mask.ravel().tolist()
-            h,w,d = self.img1.shape
+            h,w,d = img1.shape
             #pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-            dst = cv2.warpPerspective(self.img1,M, (w, h))
+            dst = cv2.warpPerspective(img2,M, (w, h))
             
+
+
             #print(dst)
-            debug("transform", self.img2)
-            debug("transform", self.img1)            
-            debug("transform", dst)
-            dstf = np.maximum(self.img2, dst)
-            debug("transform", dstf)
-            #img3 = cv2.polylines(self.img2,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+            #debug("transform", img2)
+            #debug("transform", img1)            
+            #debug("transform", dst)
+            #dstf = np.maximum(img1, dst)
+            #debug("transform", dstf)
+            #img3 = cv2.polylines(img2,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+            return dst
         else:
             print( "Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT) )
             matchesMask = None
+            return None
 
         
 
-        #debug("matched", self._match(self.img1, self.img2))
+        #debug("matched", self._match(img1, img2))
 
 
-    def __init__(self, img1, img2):
-        self.img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
-        self.img2 = cv2.copyMakeBorder(img2, 256, 256, 512, 322, cv2.BORDER_CONSTANT, 0)
+    def __init__(self):
+        #img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
+        #img2 = cv2.copyMakeBorder(img2, 256, 256, 512, 322, cv2.BORDER_CONSTANT, 0)
+        pass
