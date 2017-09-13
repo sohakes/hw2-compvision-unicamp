@@ -10,7 +10,10 @@ class OpenCVVideoStabilization:
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter(dst_video_file_path + '.avi',fourcc, fps, (640,368))
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+        print(width, height)
+        out = cv2.VideoWriter(dst_video_file_path + '.avi',fourcc, fps, (width,height))
         print(fps)
 
         transform_image = OpenCVImageTransform()

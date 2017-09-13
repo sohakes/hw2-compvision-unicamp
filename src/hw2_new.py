@@ -25,7 +25,7 @@ def main():
     #debug("res img", res)
     # Get interest points
     #interest_points('input/p2-1-1.png','output/p2-1-3-'+ str(numFile()) + '.png',4)
-    stab = OpenCVVideoStabilization('input/p2-1-8.mp4', 'output/nometemp')
+    stab = OpenCVVideoStabilization('input/p2-1-9.mp4', 'output/nometemp')
 
 
 if __name__ == '__main__':
