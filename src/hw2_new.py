@@ -27,7 +27,8 @@ def main():
     # Get interest points
     #interest_points('input/p2-1-1.png','output/p2-1-3-'+ str(numFile()) + '.png',4)
     #stab = OpenCVVideoStabilization('input/p2-1-9.mp4', 'output/nometemp')
-    img1 = cv2.imread('input/p1-1-10.png')
+    #img1 = cv2.imread('input/p1-1-10.png')
+    img1 = cv2.imread('input/p2-1-1.png')
     sift = Sift()
     sift.get_descriptors(img1)
 

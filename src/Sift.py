@@ -15,7 +15,16 @@ class Sift:
             current_octave = [processing_img]
             w, h = processing_img.shape
             for j in range(1, n_levels_octave):
-                processing_img = cv2.GaussianBlur(processing_img, (kernel_size, kernel_size), gaussian)
+                #TEMP
+                #sigma=math.pow(math.sqrt(2),j)*1.7
+                #histogram_size= int(math.ceil(7*sigma))
+                #histogram_size= 2*histogram_size+1                
+                #processing_img = cv2.GaussianBlur(current_octave[0], (histogram_size, histogram_size), sigma, sigma)
+                #debug('gauss', processing_img)
+                ###
+
+                #processing_img = cv2.GaussianBlur(processing_img, (0, 0), gaussian)
+                processing_img = cv2.GaussianBlur(current_octave[0], (0, 0), 1.7*gaussian**j)
                 current_octave.append(processing_img)
 
             octaves.append(current_octave)
@@ -140,11 +149,12 @@ class Sift:
         print('important!', len(dog_octaves), len(dog_octaves[0]))
         #important to know: the downscale must be /2, if I change that, must be changed here
         for i in range(len(dog_octaves)):
+            doc_oct = i
             current_dog_octave = dog_octaves[i]
             #just the middle ones
             kk = 0
-            #for ts in range(0, len(current_dog_octave)):
-                #debug('curr_img', (current_dog_octave[ts]*255).astype('uint8'))
+            for ts in range(0, len(current_dog_octave)):
+                debug('curr_img', (current_dog_octave[ts]*255).astype('uint8'))
 
             for ts in range(1, len(current_dog_octave) - 1):
                 current_img = current_dog_octave[ts]
@@ -166,8 +176,8 @@ class Sift:
                         
                         nx, ny, nj = c
                         if current_img[x, y] > current_dog_octave[nj][nx, ny]:
-                            #print(current_img[x, y], current_dog_octave[nj][nx, ny])
-                            #print("not minima", c)
+                            print(current_img[x, y], current_dog_octave[nj][nx, ny])
+                            print("not minima", c, x, y)
                             is_minima = False
                             break
 
@@ -184,12 +194,13 @@ class Sift:
                         continue  
                     
                     print(current_img[x,y], x, y, "CURR IMG XY")
-                    #subpixel = self._get_subpixel_keypoint(current_dog_octave, s, x, y)
-                    #if subpixel is None:
-                    #    print('no subpixel')
-                    #    continue
+                    subpixel = self._get_subpixel_keypoint(current_dog_octave, s, x, y)
+                    if subpixel is None:
+                        print('no subpixel')
+                        continue
 
-                    kpval, s, m, n = current_img[x, y], s, x, y#subpixel
+                    #kpval, s, m, n = current_img[x, y], s, x, y
+                    kpval, s, m, n = subpixel
                     #kpval = kpval[0,0]
                     #probably needs to check if not already added
 
@@ -205,9 +216,9 @@ class Sift:
                     #(x, y) = (int((size_factor*x + size_factory*(x+1)/2)), int((size_factor*y + size_factory*(y+1)/2)))
 
                     if is_maxima:
-                        maximas.append((kpval, s, m, n))
+                        maximas.append((kpval, s, m, n, doc_oct))
                     if is_minima:
-                        minimas.append((kpval, s, m, n))
+                        minimas.append((kpval, s, m, n, doc_oct))
                 debug('circles', tmp_img)
         print("the mighty", kk)
         return (minimas, maximas)
@@ -225,9 +236,9 @@ class Sift:
         print('minmax',minimas + maximas)
         img_temp = img_color
         print(img_temp.shape)
-        for kpval, s, m, n in minimas + maximas:
-            print((m*(2^(s-1)), n*(2^(s-1))))
-            img_temp = cv2.circle(img_temp,(m*(2^(s-1)), n*(2^(s-1))), 2, (0,255,0), 2)
+        for kpval, s, m, n, octv in minimas + maximas:
+            print((m*(2**(octv-1)), n*(2**(octv-1))))
+            img_temp = cv2.circle(img_temp,(int(n*(2**(octv-1))), int(m*(2**(octv-1)))), 2, (0,255,0), 2)
 
         debug('img', img_temp)
 
