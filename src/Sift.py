@@ -99,7 +99,7 @@ class Sift:
         hess = self._calc_interpolate_hessian(w,s,m,n)
         grad = self._calc_gradient(w,s,m,n)
         alpha = self._calc_alpha(hess, grad)
-        if alpha == None:
+        if alpha is None:
             print("not invertible", hess)
             #print(w[s][m-3:m+3,n-3:n+3])
             return None
@@ -118,7 +118,7 @@ class Sift:
             hess = self._calc_interpolate_hessian(w,s,m,n)
             grad = self._calc_gradient(w,s,m,n)
             alpha = self._calc_alpha(hess, grad)
-            if alpha == None:
+            if alpha is None:
                 print("not invertible2", hess)
                 return None
 
