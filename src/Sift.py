@@ -224,7 +224,7 @@ class Sift:
         return (minimas, maximas)
                     
     #IMPORTANT: the c_edge value is for [0,1], I think it's still ok since it's a ratio
-    def get_descriptors(self, img_color, n_octaves=4, n_levels_octave=5, kernel_size=7, gaussian=math.sqrt(2), c_edge=100):
+    def get_descriptors(self, img_color, n_octaves=4, n_levels_octave=5, kernel_size=7, gaussian=math.sqrt(2), c_edge=10):
         #img must be black and white
         img_u = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY).astype(float)/255      
         w, h = img_u.shape 
