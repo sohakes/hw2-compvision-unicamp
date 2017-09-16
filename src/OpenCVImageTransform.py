@@ -10,7 +10,9 @@ class OpenCVImageTransform:
 
         sift = cv2.xfeatures2d.SIFT_create()
         kp, des = sift.detectAndCompute(gray,None)
-
+        
+        img=cv2.drawKeypoints(img,kp, img)
+        debug('sift', img)
         return (kp, des)
 
     #def _fit_model(self):

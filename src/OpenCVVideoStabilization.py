@@ -26,9 +26,10 @@ class OpenCVVideoStabilization:
                 out_frame = cv2.copyMakeBorder(frame, 100, 100, 100, 100, cv2.BORDER_CONSTANT, 0)
                 if last_frame is not None:
                     #last_frame is already with a border
-                    out_frame = transform_image.show_matched(last_frame, out_frame)
-                                    
-                last_frame = out_frame
+                    out_frame = transform_image.show_matched(last_frame, out_frame)                                    
+                else:
+                    last_frame = out_frame
+
                 w, h, c = out_frame.shape
                 fout_frame = out_frame[200:w-200,200:h-200,:]
                 print(out_frame.shape, fout_frame.shape, frame.shape)

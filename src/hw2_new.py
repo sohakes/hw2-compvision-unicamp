@@ -17,8 +17,8 @@ def main():
     #create_image('input/p2-1-3.mp4')
 
     # Get interest points // Remover after
-    #img1 = cv2.imread('input/p2-1-1.png')
-    #img2 = cv2.imread('input/p2-1-2.png')
+    #img1 = cv2.imread('input/p2-1-3.png')
+    #img2 = cv2.imread('input/p2-1-3.png')
     #img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
     #img2 = cv2.copyMakeBorder(img2, 256, 256, 512, 322, cv2.BORDER_CONSTANT, 0)
     #stab = OpenCVImageTransform()
@@ -28,7 +28,7 @@ def main():
     #interest_points('input/p2-1-1.png','output/p2-1-3-'+ str(numFile()) + '.png',4)
     #stab = OpenCVVideoStabilization('input/p2-1-9.mp4', 'output/nometemp')
     #img1 = cv2.imread('input/p1-1-10.png')
-    img1 = cv2.imread('input/p2-1-1.png')
+    img1 = cv2.imread('input/p2-1-3.png')
     sift = Sift()
     sift.get_descriptors(img1)
 

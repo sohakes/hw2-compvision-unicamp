@@ -300,9 +300,11 @@ class Sift:
         print("fnorm", fnorm)
 
         feature_vector[feature_vector > norm_thresh] = norm_thresh
+        feature_vector = feature_vector*512/fnorm
+        feature_vector[feature_vector > 255] = 255
 
-        for le in range(n_hist*n_hist*n_ori):
-            feature_vector[le] = min(math.floor(512*feature_vector[le]/fnorm), 255)
+        #for le in range(n_hist*n_hist*n_ori):
+        #    feature_vector[le] = min(math.floor(512*feature_vector[le]/fnorm), 255)
 
         return feature_vector
                 
