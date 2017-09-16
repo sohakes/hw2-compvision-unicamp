@@ -4,6 +4,7 @@ import math
 from utils import *
 from Sift import *
 from OpenCVVideoStabilization import *
+from OpenCVImageTransform import *
 
 ################  HW2  #####################
 # Nathana Facion                 RA:191079
@@ -17,8 +18,8 @@ def main():
     #create_image('input/p2-1-3.mp4')
 
     # Get interest points // Remover after
-    #img1 = cv2.imread('input/p2-1-3.png')
-    #img2 = cv2.imread('input/p2-1-3.png')
+    #img1 = cv2.imread('input/p2-1-1.png')
+    #img2 = cv2.imread('input/p2-1-2.png')
     #img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
     #img2 = cv2.copyMakeBorder(img2, 256, 256, 512, 322, cv2.BORDER_CONSTANT, 0)
     #stab = OpenCVImageTransform()
