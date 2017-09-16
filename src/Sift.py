@@ -237,7 +237,7 @@ class Sift:
             ny = (-(m * delta - x) * math.sin(theta) + (n * delta - y) * math.cos(delta))/gamma
             return (nx, ny)
 
-        wid, hei = dog[1][0].shape
+        wid, hei = dog[dog_oct][s].shape
         rang = math.sqrt(2) * lam_descr * gamma               
 
         ration_hist = ((n_hist+1)/n_hist)
@@ -246,8 +246,13 @@ class Sift:
         maxx = int(round((x + rang2)/delta)) + 1
         miny = int(round((y - rang2)/delta))
         maxy = int(round((y + rang2)/delta)) + 1
+        
+        #minx = math.ceil((-rang+x)/delta)
+        #maxx = math.floor(1 + (rang+x)/delta)
+        #miny = math.ceil((-rang+y)/delta)
+        #maxy = math.floor(1 + (rang+y)/delta)
 
-        if minx < 0 or maxx >= wid or miny < 0 or maxy >= hei:
+        if minx <= 0 or maxx >= wid - 1 or miny <= 0 or maxy >= hei - 1:
             return None 
 
         histograms = [[[0]*n_ori]*n_hist]*n_hist
@@ -262,7 +267,7 @@ class Sift:
                 #Compute normalized gradient orientation
                 grad = self._gradient_m_n(dog[dog_oct], s, m, n)
                 ntheta = (np.arctan2(grad[0], grad[1]) - theta) % 2*math.pi
-                print("ntheta", ntheta)
+                #print("ntheta", ntheta)
 
                 #compute contribution
                 exponent = -((math.pow(delta * m - x,2) + math.pow(delta * n - y,2)))/(2*((lam_descr*gamma)**2))
@@ -287,7 +292,7 @@ class Sift:
                                 * contribution) 
 
                             #print("hist", i, j, k, histograms[i-1][j-1][k-1])
-        print(histograms)
+        #print(histograms)
         feature_vector = [0]*(n_hist*n_hist*n_ori)
         for i in range(n_hist):
             for j in range(n_hist):
@@ -297,7 +302,7 @@ class Sift:
         feature_vector = np.array(feature_vector)
         fnorm = np.linalg.norm(feature_vector)
         norm_thresh = 0.2 * fnorm        
-        print("fnorm", fnorm)
+        #print("fnorm", fnorm)
 
         feature_vector[feature_vector > norm_thresh] = norm_thresh
         feature_vector = feature_vector*512/fnorm
@@ -320,9 +325,10 @@ class Sift:
                 if kpt is None:
                     continue
                 fv = self._normalized_descriptor(dog, kpt, lam_descr, n_hist, n_ori)
-                final_features.append((kpt, fv))
+                if fv is not None:
+                    final_features.append((kpt, fv))
 
-        print("FINAL FEATURES YAY",final_features)
+        #print("FINAL FEATURES YAY",final_features)
         return final_features
                 
             
@@ -424,14 +430,16 @@ class Sift:
         kpt_fv = self._describe_keypoints(dog_octaves, minimas, maximas, lam, n_bins, threshold, lam_descr, n_hist, n_ori)
 
         img_temp = img_color
-        print(img_temp.shape)
-        for kpt, fv in kpt_fv:
-            kpval, s, mt, nt, doc_oct, rx, ry, gamma, theta = kpt
-            img_temp = cv2.circle(img_temp,(int(round(ry)), int(round(rx))), 2, (0,255,0), 2)
+        #print(img_temp.shape)
+        #for kpt, fv in kpt_fv:
+        #    kpval, s, mt, nt, doc_oct, rx, ry, gamma, theta = kpt
+        #    img_temp = cv2.circle(img_temp,(int(round(ry)), int(round(rx))), 2, (0,255,0), 2)
 
-        debug('img', img_temp)
+        #debug('img', img_temp)
 
-        #return (kp, des)
+        kpt_fv_r = [((int(round(k[0][6])), int(round(k[0][5])), k[0][6], k[0][5], k[0][8]), k[1]) for k in kpt_fv]
+
+        return kpt_fv_r
 
     def __init__(self):
         pass
