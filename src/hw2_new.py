@@ -4,6 +4,7 @@ import math
 from utils import *
 from Sift import *
 from OpenCVVideoStabilization import *
+from OpenCVImageTransform import *
 
 ################  HW2  #####################
 # Nathana Facion                 RA:191079
@@ -28,9 +29,14 @@ def main():
     #interest_points('input/p2-1-1.png','output/p2-1-3-'+ str(numFile()) + '.png',4)
     #stab = OpenCVVideoStabilization('input/p2-1-9.mp4', 'output/nometemp')
     #img1 = cv2.imread('input/p1-1-10.png')
+    #img1 = cv2.imread('input/p2-1-1.png')
+    #sift = Sift()
+    #sift.get_descriptors(img1)
     img1 = cv2.imread('input/p2-1-1.png')
-    sift = Sift()
-    sift.get_descriptors(img1)
+    img2 = cv2.imread('input/p2-1-2.png')
+    stab = OpenCVImageTransform()
+    res = stab.show_matched(img1, img2)
+    
 
 if __name__ == '__main__':
    main()
