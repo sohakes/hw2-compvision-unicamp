@@ -356,7 +356,7 @@ class Sift:
                     kk +=1
                     combs = [(x - a, y - b, s - c) for a in (-1, 0, 1) for b in (-1, 0, 1) for c in (0, 0, 0)]
                     combs.remove((x, y, s))
-
+                    has_min_max = True
                     is_minima = True
                     is_maxima = True
                     #not sure if there can me more than one extrema with same value, I think it can
@@ -365,21 +365,21 @@ class Sift:
                     for c in combs:
                         
                         nx, ny, nj = c
-                        if current_img[x, y] > current_dog_octave[nj][nx, ny]:
+                        if current_img[x, y] > current_dog_octave[nj][nx, ny] and is_minima == True:
                             #print(current_img[x, y], current_dog_octave[nj][nx, ny])
                             #print("not minima", c, x, y)
                             is_minima = False
-                            break
 
-                    for c in combs:
-                        nx, ny, nj = c
-                        if current_img[x, y] < current_dog_octave[nj][nx, ny]:
+                        if current_img[x, y] < current_dog_octave[nj][nx, ny] and is_maxima == True:
                             #print(current_img[x, y], current_dog_octave[nj][nx, ny])
                             #print("not maxima", c)
                             is_maxima = False
-                            break               
 
-                    if is_minima == False and is_maxima == False:
+                        if is_maxima == False and is_minima == False:
+                            has_min_max = False
+                            break          
+
+                    if has_min_max == False:
                         #print("not either")
                         continue  
                     
