@@ -34,10 +34,21 @@ def main():
     #img1 = cv2.imread('input/p2-1-3.png')
     #img2 = cv2.imread('input/p2-1-4.png')
     sift = Sift()
-    des1 = sift.get_descriptors(img1)
-    des2 = sift.get_descriptors(img2)
+    des1 = None
+    des2 = None
+    try:
+        des1 = np.load('kpd1.npy')
+        des2 = np.load('kpd2.npy')
+        print('loaded')
+    except IOError:
+        des1 = sift.get_descriptors(img1, outname='im1')
+        des2 = sift.get_descriptors(img2, outname='im1')
+        np.save('kpd1.npy', des1)
+        np.save('kpd2.npy', des2)
+        print('ioerror')
+
     imt = ImageTransform()
-    imt.draw_lines_matches(des1, des2, img1, img2)
+    imt.find_and_apply_transformation(des1, des2, img1, img2)
 
 if __name__ == '__main__':
    main()

@@ -28,17 +28,3 @@ def debug(name,img):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def create_gaussian_mask(size, sigma):
-    assert size % 2 == 1, "mask should have odd size"
-    def pixel_val(x):
-        exp = math.e**(-(x**2)/(2*(sigma**2)))
-        return ((1.0 * exp) /(math.sqrt(2 * math.pi) * sigma))
-
-    halfsize_i = math.floor(size / 2)
-
-    mask = np.array([pixel_val(i) for i in range(-halfsize_i, halfsize_i + 1)])
-    print(mask)
-    msum = np.sum(mask)
-
-    return mask / msum
-

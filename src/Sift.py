@@ -418,7 +418,7 @@ class Sift:
                     
     #IMPORTANT: the c_edge value is for [0,1], I think it's still ok since it's a ratio
     def get_descriptors(self, img_color, n_octaves=4, n_levels_octave=5, kernel_size=7,
-            gaussian=0.8, c_edge=10, lam=1.5, n_bins=36, threshold=0.8, lam_descr = 6, n_hist = 4, n_ori = 8):
+            gaussian=0.8, c_edge=10, lam=1.5, n_bins=36, threshold=0.8, lam_descr = 6, n_hist = 4, n_ori = 8, outname = 'img'):
         #img must be black and white
         img_u = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY).astype(float)/255      
         w, h = img_u.shape 
@@ -430,10 +430,12 @@ class Sift:
         kpt_fv = self._describe_keypoints(dog_octaves, minimas, maximas, lam, n_bins, threshold, lam_descr, n_hist, n_ori)
 
         img_temp = img_color
-        #print(img_temp.shape)
-        #for kpt, fv in kpt_fv:
-        #    kpval, s, mt, nt, doc_oct, rx, ry, gamma, theta = kpt
-        #    img_temp = cv2.circle(img_temp,(int(round(ry)), int(round(rx))), 2, (0,255,0), 2)
+        print(img_temp.shape)
+        for kpt, fv in kpt_fv:
+            kpval, s, mt, nt, doc_oct, rx, ry, gamma, theta = kpt
+            img_temp = cv2.circle(img_temp,(int(round(ry)), int(round(rx))), 2, (0,255,0), 1)
+
+        cv2.imwrite('output/' + outname + '.png', img_temp)
 
         #debug('img', img_temp)
 
