@@ -10,12 +10,12 @@ class VideoStabilization:
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) + 250  # float
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) + 250# float
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) + 0  # float
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) + 0# float
         length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         #print('width, height', width, height)
         out = cv2.VideoWriter(dst_video_file_path + '.avi',fourcc, fps, (width,height))
-        out2 = cv2.VideoWriter(dst_video_file_path + 'unfix.avi',fourcc, fps, (width-250,height-250))
+        out2 = cv2.VideoWriter(dst_video_file_path + 'unfix.avi',fourcc, fps, (width-0,height-0))
         #print('fps', fps)
 
         transform_image = ImageTransform()
@@ -25,15 +25,15 @@ class VideoStabilization:
             #print('in')
             ret, frame = cap.read()
             if ret==True:
-                print("frame", it, "of", length, ', %.2f %%' % (100*(it/length)))
+                #print("frame", it, "of", length, ', %.2f %%' % (100*(it/length)))
                 it += 1
-                if it < 30:
-                    continue
+                #if it < 30:
+                #    continue
                 
                 print('got in', it)
                 out_frame = None
                 if first_frame is not None:
-                    print('if')
+                    #print('if')
                     #first_frame is already with a border     
                     newframe = first_frame.copy()               
                     out_frame = transform_image.show_matched_reuse(newframe, frame)
@@ -41,9 +41,10 @@ class VideoStabilization:
                         print("skipping frame")
                         continue                                                 
                 else:
-                    print('else')
+                    #print('else')
                     #transform_image.set_first_frame(first_frame)                     
-                    out_frame = cv2.copyMakeBorder(frame, 125, 125, 125, 125, cv2.BORDER_CONSTANT, 0)
+                    #out_frame = cv2.copyMakeBorder(frame, 125, 125, 125, 125, cv2.BORDER_CONSTANT, 0)
+                    out_frame = frame.copy()
                     first_frame = frame.copy()
                     new_frame = frame
                     transform_image.set_first_frame(new_frame)
@@ -53,7 +54,7 @@ class VideoStabilization:
 
                 w, h, c = out_frame.shape
                 #fout_frame = out_frame[200:w-200,200:h-200,:]
-                print('shapes outframe, frame', out_frame.shape, frame.shape, width+250, height+250)
+               #print('shapes outframe, frame', out_frame.shape, frame.shape, width+250, height+250)
                 # write the flipped frame
                 out.write(out_frame)
                 out2.write(frame)

@@ -13,7 +13,15 @@ from ImageTransform import *
 # Rafael Mariottini Tomazela     RA:192803
 ############################################
 
-
+def write_transform(path1, path2):
+    img1 = cv2.imread(path1)
+    img2 = cv2.imread(path2)
+    sift = Sift()
+    des1 = sift.get_descriptors(img1)
+    des2 = sift.get_descriptors(img2)
+    imt = ImageTransform()
+    im = imt.find_and_apply_transformation(des1, des2, img1, img2, 400)
+    write_image(4, im)
 
 def main():
     # Create image by video
@@ -35,11 +43,17 @@ def main():
     #img1 = cv2.imread('input/p2-1-3.png')
     #img2 = cv2.imread('input/p2-1-4.png')
 
-    stab = VideoStabilization('input/p2-1-0.mp4', 'output/nometempour') #or 11 for nathana, 12 for mine again
+    #stab = VideoStabilization('input/p2-1-13.mp4', 'output/nometempour') #or 11 for nathana, 12 for mine again
+    print("First set of images on sift")
+    write_transform('input/p2-1-7.png', 'input/p2-1-8.png')
+
+    print("Second set of images on sift")
+    write_transform('input/p2-1-1.png', 'input/p2-1-2.png')
+
+    print("Stabilizaing video")
+    stab = VideoStabilization('input/p2-1-13.mp4', 'output/p2-5-0') #or 11 for nathana, 12 for mine again
+    
     """
-    img1 = cv2.imread('input/p2-1-8.png')
-    img2 = cv2.imread('input/p2-1-7.png')
-    sift = Sift()
     des1 = None
     des2 = None
     try:
@@ -56,10 +70,9 @@ def main():
     #print("des1", des1)
     #print("des2", des2)
     #return
-
-    imt = ImageTransform()
-    imt.find_and_apply_transformation_no_src(des1, des2, img1, img2)
     """
+    
+    
 
 if __name__ == '__main__':
    main()
