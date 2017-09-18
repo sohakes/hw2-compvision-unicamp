@@ -15,22 +15,25 @@ class VideoStabilization:
         length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         #print('width, height', width, height)
         out = cv2.VideoWriter(dst_video_file_path + '.avi',fourcc, fps, (width,height))
-        out2 = cv2.VideoWriter(dst_video_file_path + 'unfix.avi',fourcc, fps, (width-0,height-0))
+        #out2 = cv2.VideoWriter(dst_video_file_path + 'unfix.avi',fourcc, fps, (width-0,height-0))
         #print('fps', fps)
 
         transform_image = ImageTransform()
         it = 0
         first_frame = None
+        print("Skipping first 30 frames...")
         while(cap.isOpened()):
             #print('in')
             ret, frame = cap.read()
             if ret==True:
-                #print("frame", it, "of", length, ', %.2f %%' % (100*(it/length)))
-                it += 1
-                #if it < 30:
-                #    continue
                 
-                print('got in', it)
+                it += 1
+                if it < 30:
+                    continue
+
+                print("frame", it-30, "of", length-30, ', %.2f %%' % (100*((it-30)/(length-30))))
+                
+                #print('got in', it)
                 out_frame = None
                 if first_frame is not None:
                     #print('if')
@@ -57,7 +60,7 @@ class VideoStabilization:
                #print('shapes outframe, frame', out_frame.shape, frame.shape, width+250, height+250)
                 # write the flipped frame
                 out.write(out_frame)
-                out2.write(frame)
+                #out2.write(frame)
 
                 #cv2.imshow('out_frame',fout_frame)
                 #if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -68,5 +71,5 @@ class VideoStabilization:
         # Release everything if job is finished
         cap.release()
         out.release()
-        out2.release()
+        #out2.release()
         cv2.destroyAllWindows()

@@ -45,13 +45,13 @@ def main():
 
     #stab = VideoStabilization('input/p2-1-13.mp4', 'output/nometempour') #or 11 for nathana, 12 for mine again
     print("First set of images on sift")
-    write_transform('input/p2-1-7.png', 'input/p2-1-8.png')
+    #write_transform('input/p2-1-7.png', 'input/p2-1-8.png')
 
     print("Second set of images on sift")
-    write_transform('input/p2-1-1.png', 'input/p2-1-2.png')
+    #write_transform('input/p2-1-1.png', 'input/p2-1-2.png')
 
     print("Stabilizaing video")
-    stab = VideoStabilization('input/p2-1-13.mp4', 'output/p2-5-0') #or 11 for nathana, 12 for mine again
+    stab = VideoStabilization('input/p2-5-13.mp4', 'output/p2-5-0') #or 11 for nathana, 12 for mine again
     
     """
     des1 = None

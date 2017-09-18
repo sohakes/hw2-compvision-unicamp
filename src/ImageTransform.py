@@ -103,7 +103,7 @@ class ImageTransform:
     def ransac(self, kpd1, kpd2, matches):
         thresh = 4
         p = 0.99
-        n = 5000 #infinite, or just big enough
+        n = 10000 #infinite, or just big enough
 
         X, Y = self.fill_matrix_points_XY(kpd1, kpd2, matches)
         best_inliers = []
@@ -111,7 +111,7 @@ class ImageTransform:
         iterations = 0
         A = None
         best_sum_dist = 100000
-        while A is None and iterations < n*5:
+        while A is None and iterations < n*2:
             n = 10000
             while n > iterations:
                 #print(iterations, n)
@@ -264,8 +264,8 @@ class ImageTransform:
         
     def show_matched(self, img2, img1):
         sift = Sift()
-        des1 = sift.get_descriptors(img1, outname='im1')
-        des2 = sift.get_descriptors(img2, outname='im2')
+        des1 = sift.get_descriptors(img1)
+        des2 = sift.get_descriptors(img2)
         dest = self.find_and_apply_transformation_no_src(des1, des2, img1, img2)
         
         debug('img_dest', dest)
@@ -273,12 +273,12 @@ class ImageTransform:
 
     def set_first_frame(self, img2):
         sift = Sift()
-        self.des2 = sift.get_descriptors(img2, outname='im2')
+        self.des2 = sift.get_descriptors(img2)
 
 
     def show_matched_reuse(self, img2, img1):
         sift = Sift()
-        des1 = sift.get_descriptors(img1, outname='im1')
+        des1 = sift.get_descriptors(img1)
         dest = self.find_and_apply_transformation_no_src(des1, self.des2, img1, img2)
         debug('img_dest', dest)
         return dest
