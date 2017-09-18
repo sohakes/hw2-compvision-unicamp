@@ -95,9 +95,9 @@ class ImageTransform:
 
     #match is ((idx1, idx2), dist)
     def ransac(self, kpd1, kpd2, matches):
-        thresh = 4
+        thresh = 2
         p = 0.99
-        n = 100 #infinite, or just big enough
+        n = 1000 #infinite, or just big enough
 
         X, Y = self.fill_matrix_points_XY(kpd1, kpd2, matches)
         best_inliers = []

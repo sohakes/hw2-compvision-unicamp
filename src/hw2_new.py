@@ -47,6 +47,10 @@ def main():
         np.save('kpd2.npy', des2)
         print('ioerror')
 
+    print("des1", des1)
+    print("des2", des2)
+    #return
+
     imt = ImageTransform()
     imt.find_and_apply_transformation(des1, des2, img1, img2)
 

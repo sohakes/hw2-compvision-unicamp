@@ -233,8 +233,9 @@ class Sift:
         kpval, s, mt, nt, dog_oct, x, y, gamma, theta = keypoint_theta
         delta = self._calc_delta(dog_oct)
         def calc_normalized_cord(m, n):
-            nx = ((m * delta - x) * math.cos(theta) + (n * delta - y) * math.sin(delta))/gamma
-            ny = (-(m * delta - x) * math.sin(theta) + (n * delta - y) * math.cos(delta))/gamma
+            nx = ((m * delta - x) * math.cos(theta) + (n * delta - y) * math.sin(theta))/gamma
+            ny = (-(m * delta - x) * math.sin(theta) + (n * delta - y) * math.cos(theta))/gamma
+            #print("point mnxy:", m, n, nx, ny, theta)
             return (nx, ny)
 
         wid, hei = dog[dog_oct][s].shape
@@ -242,10 +243,10 @@ class Sift:
 
         ration_hist = ((n_hist+1)/n_hist)
         rang2 = rang * ration_hist
-        minx = int(round((x - rang2)/delta))
-        maxx = int(round((x + rang2)/delta)) + 1
-        miny = int(round((y - rang2)/delta))
-        maxy = int(round((y + rang2)/delta)) + 1
+        minx = math.ceil((-rang2+x)/delta)
+        maxx = math.floor(1 + (rang2+x)/delta)
+        miny = math.ceil((-rang2+y)/delta)
+        maxy = math.floor(1 + (rang2+y)/delta)
         
         #minx = math.ceil((-rang+x)/delta)
         #maxx = math.floor(1 + (rang+x)/delta)
@@ -283,7 +284,7 @@ class Sift:
 
                         for k in range(1, n_ori + 1):
                             thetak = 2*math.pi*(k-1)/n_ori
-                            if abs((thetak - ntheta)%2*math.pi) >= 2*math.pi/n_ori:
+                            if abs((thetak - ntheta)%(2*math.pi)) >= 2*math.pi/n_ori:
                                 continue
                             histograms[i-1][j-1][k-1] = (histograms[i-1][j-1][k-1]
                                 + (1 - ((n_hist)/(2*lam_descr))*abs(xi-nx))
