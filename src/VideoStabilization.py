@@ -27,22 +27,33 @@ class VideoStabilization:
             if ret==True:
                 print("frame", it, "of", length, ', %.2f %%' % (100*(it/length)))
                 it += 1
+                if it < 30:
+                    continue
+                
+                print('got in', it)
                 out_frame = None
                 if first_frame is not None:
-                    #first_frame is already with a border                    
-                    out_frame = transform_image.show_matched_reuse(first_frame, frame)
+                    print('if')
+                    #first_frame is already with a border     
+                    newframe = first_frame.copy()               
+                    out_frame = transform_image.show_matched_reuse(newframe, frame)
                     if out_frame is None:
                         print("skipping frame")
                         continue                                                 
                 else:
+                    print('else')
                     #transform_image.set_first_frame(first_frame)                     
                     out_frame = cv2.copyMakeBorder(frame, 125, 125, 125, 125, cv2.BORDER_CONSTANT, 0)
-                    first_frame = frame
-                    transform_image.set_first_frame(first_frame)
+                    first_frame = frame.copy()
+                    new_frame = frame
+                    transform_image.set_first_frame(new_frame)
+
+                debug('first frame', first_frame)
+                debug('out frame', out_frame)
 
                 w, h, c = out_frame.shape
                 #fout_frame = out_frame[200:w-200,200:h-200,:]
-                #print('shapes outframe, frame', out_frame.shape, frame.shape)
+                print('shapes outframe, frame', out_frame.shape, frame.shape, width+250, height+250)
                 # write the flipped frame
                 out.write(out_frame)
                 out2.write(frame)

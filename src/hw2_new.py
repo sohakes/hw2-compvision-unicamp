@@ -35,7 +35,7 @@ def main():
     #img1 = cv2.imread('input/p2-1-3.png')
     #img2 = cv2.imread('input/p2-1-4.png')
 
-    stab = VideoStabilization('input/p2-1-0.mp4', 'output/nometempour')
+    stab = VideoStabilization('input/p2-1-0.mp4', 'output/nometempour') #or 11 for nathana, 12 for mine again
     """
     img1 = cv2.imread('input/p2-1-8.png')
     img2 = cv2.imread('input/p2-1-7.png')

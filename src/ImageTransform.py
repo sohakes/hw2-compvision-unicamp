@@ -96,7 +96,7 @@ class ImageTransform:
 
     #match is ((idx1, idx2), dist)
     def ransac(self, kpd1, kpd2, matches):
-        thresh = 2
+        thresh = 4
         p = 0.99
         n = 5000 #infinite, or just big enough
 
@@ -105,8 +105,9 @@ class ImageTransform:
         #best_A = []
         iterations = 0
         A = None
+        best_sum_dist = 100000
         while A is None and iterations < n*5:
-
+            n = 5000
             while n > iterations:
                 #print(iterations, n)
                 #find affine matrix for three points
@@ -122,6 +123,7 @@ class ImageTransform:
                 Ytest = X*Asamp
                 inliers = []
                 #print('start', Asamp)
+                sum_dist = 0
                 for i in range(1, len(Ytest), 2):
                     x1, y1 = Ytest[i-1, 0], Ytest[i, 0]
                     x2, y2 = Y[i-1,0], Y[i,0]
@@ -130,8 +132,10 @@ class ImageTransform:
                     if dist < thresh:
                         #print('done', (i-1)/2)
                         inliers.append(matches[int((i-1)/2)]) #append the match
+                        sum_dist += dist
 
-                if len(inliers) > len(best_inliers):
+                if len(inliers) > len(best_inliers) or (len(inliers) == len(best_inliers) and best_sum_dist > sum_dist) :
+                    best_sum_dist = sum_dist
                     best_inliers = inliers
                     #best_A = Asamp
                     w = len(inliers)/len(matches)
