@@ -7,7 +7,7 @@ import math
 # Rafael Mariottini Tomazela     RA:192803
 ############################################
 
-DEBUG = True
+DEBUG = False
 NUMBER_FILE = -1
 
 def numFile():

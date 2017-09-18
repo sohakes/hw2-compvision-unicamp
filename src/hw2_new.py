@@ -4,6 +4,7 @@ import math
 from utils import *
 from Sift import *
 from OpenCVVideoStabilization import *
+from VideoStabilization import *
 from OpenCVImageTransform import *
 from ImageTransform import *
 
@@ -19,9 +20,9 @@ def main():
     #create_image('input/p2-1-3.mp4')
 
     # Get interest points // Remover after
-    img1 = cv2.imread('input/p2-1-1.png')
+    #img1 = cv2.imread('input/p2-1-2.png')
     #img2 = cv2.imread('input/p2-1-2.png')
-    img2 = cv2.imread('input/p2-1-5.png')
+    #img2 = cv2.imread('input/p2-1-7.png')
     #img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
     #img2 = cv2.copyMakeBorder(img2, 256, 256, 512, 322, cv2.BORDER_CONSTANT, 0)
     #stab = OpenCVImageTransform()
@@ -33,6 +34,11 @@ def main():
     #img1 = cv2.imread('input/p1-1-10.png')
     #img1 = cv2.imread('input/p2-1-3.png')
     #img2 = cv2.imread('input/p2-1-4.png')
+
+    stab = VideoStabilization('input/p2-1-0.mp4', 'output/nometempour')
+    """
+    img1 = cv2.imread('input/p2-1-8.png')
+    img2 = cv2.imread('input/p2-1-7.png')
     sift = Sift()
     des1 = None
     des2 = None
@@ -42,17 +48,18 @@ def main():
         print('loaded')
     except IOError:
         des1 = sift.get_descriptors(img1, outname='im1')
-        des2 = sift.get_descriptors(img2, outname='im1')
+        des2 = sift.get_descriptors(img2, outname='im2')
         np.save('kpd1.npy', des1)
         np.save('kpd2.npy', des2)
         print('ioerror')
 
-    print("des1", des1)
-    print("des2", des2)
+    #print("des1", des1)
+    #print("des2", des2)
     #return
 
     imt = ImageTransform()
-    imt.find_and_apply_transformation(des1, des2, img1, img2)
+    imt.find_and_apply_transformation_no_src(des1, des2, img1, img2)
+    """
 
 if __name__ == '__main__':
    main()

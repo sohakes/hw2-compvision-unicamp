@@ -27,7 +27,7 @@ class Sift:
 
     #in the original paper, he recommends 5 levels
     def _get_gaussian_pyramid(self, img, n_octaves=4, n_levels_octave=5, kernel_size = 7, gaussian = 0.8):
-        assert n_levels_octave >= 4
+        assert n_levels_octave >= 3
         assert n_octaves >= 3
         octaves = []
         first_sigma = 2*math.sqrt((0.8)**2-(0.5)**2)
@@ -267,7 +267,7 @@ class Sift:
                 
                 #Compute normalized gradient orientation
                 grad = self._gradient_m_n(dog[dog_oct], s, m, n)
-                ntheta = (np.arctan2(grad[0], grad[1]) - theta) % 2*math.pi
+                ntheta = (np.arctan2(grad[0], grad[1]) - theta) % (2*math.pi)
                 #print("ntheta", ntheta)
 
                 #compute contribution
@@ -398,7 +398,7 @@ class Sift:
                     tmp_img = cv2.circle(tmp_img,(n,m), 1, (255,255,255), 1)
 
                     #discard values lower that 0.03 as the paper says
-                    if abs(kpval) <= 0.03 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
+                    if abs(kpval) <= 0.015 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
                         #print('nope', abs(kpval) <= 0.03, kpval)
                         continue
                     #print('HERE!')
@@ -418,11 +418,13 @@ class Sift:
 
                     
     #IMPORTANT: the c_edge value is for [0,1], I think it's still ok since it's a ratio
-    def get_descriptors(self, img_color, n_octaves=4, n_levels_octave=5, kernel_size=7,
+    def get_descriptors(self, img_color, n_octaves=8, n_levels_octave=4, kernel_size=7,
             gaussian=0.8, c_edge=10, lam=1.5, n_bins=36, threshold=0.8, lam_descr = 6, n_hist = 4, n_ori = 8, outname = 'img'):
         #img must be black and white
+        
         img_u = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY).astype(float)/255      
         w, h = img_u.shape 
+        n_octaves = min(math.floor(np.log2(min(w, h)/(0.5/12)) + 1), n_octaves)
         img = cv2.resize(img_u, dsize=(h*2, w*2), interpolation= cv2.INTER_LINEAR)        
         g_octaves = self._get_gaussian_pyramid(img, n_octaves, n_levels_octave, kernel_size, gaussian)
         dog_octaves = self._get_dog_pyramid(g_octaves)
@@ -430,8 +432,8 @@ class Sift:
     
         kpt_fv = self._describe_keypoints(dog_octaves, minimas, maximas, lam, n_bins, threshold, lam_descr, n_hist, n_ori)
 
-        img_temp = img_color
-        print(img_temp.shape)
+        img_temp = img_color.copy()
+        #print(img_temp.shape)
         for kpt, fv in kpt_fv:
             kpval, s, mt, nt, doc_oct, rx, ry, gamma, theta = kpt
             img_temp = cv2.circle(img_temp,(int(round(ry)), int(round(rx))), 2, (0,255,0), 1)

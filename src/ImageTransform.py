@@ -5,6 +5,7 @@ from math import*
 import operator
 import random
 import itertools
+from Sift import *
 #from matplotlib import pyplot as plt
 
 
@@ -95,9 +96,9 @@ class ImageTransform:
 
     #match is ((idx1, idx2), dist)
     def ransac(self, kpd1, kpd2, matches):
-        thresh = 2
+        thresh = 5
         p = 0.99
-        n = 1000 #infinite, or just big enough
+        n = 2000 #infinite, or just big enough
 
         X, Y = self.fill_matrix_points_XY(kpd1, kpd2, matches)
         best_inliers = []
@@ -105,7 +106,7 @@ class ImageTransform:
         iterations = 0
 
         while n > iterations:
-            print(iterations, n)
+            #print(iterations, n)
             #find affine matrix for three points
             selected_matches = random.sample(matches, 3)
             Xsamp, Ysamp = self.fill_matrix_points_XY(kpd1, kpd2, selected_matches)
@@ -118,14 +119,14 @@ class ImageTransform:
             #check the rest
             Ytest = X*Asamp
             inliers = []
-            print('start', Asamp)
+            #print('start', Asamp)
             for i in range(1, len(Ytest), 2):
                 x1, y1 = Ytest[i-1, 0], Ytest[i, 0]
                 x2, y2 = Y[i-1,0], Y[i,0]
                 dist = math.sqrt(math.pow(x1-x2, 2) + math.pow(y1-y2, 2))
-                print('dist', dist, x1, y1, x2, y2)
+                #print('dist', dist, x1, y1, x2, y2)
                 if dist < thresh:
-                    print('done', (i-1)/2)
+                    #print('done', (i-1)/2)
                     inliers.append(matches[int((i-1)/2)]) #append the match
 
             if len(inliers) > len(best_inliers):
@@ -133,31 +134,74 @@ class ImageTransform:
                 #best_A = Asamp
                 w = len(inliers)/len(matches)
                 #n = np.log(1-p)/np.log(1-w**n)
-            print('inliers, best',inliers, best_inliers)
+            #print('inliers, best',inliers, best_inliers)
 
             iterations += 1
 
         #find affine for all the inliers now
-        Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
-        Af = self.find_affine_matrix(Xf, Yf)
+        best_inliers2 = [((x[0][1], x[0][0]), x[1]) for x in best_inliers]
+        Xf, Yf = self.fill_matrix_points_XY(kpd2, kpd1, best_inliers2)
+        A = self.find_affine_matrix(Xf, Yf)
+        #Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
+        #A = self.find_affine_matrix(Xf, Yf)
 
-        assert Af is not None
+        assert A is not None
 
-        return Af, best_inliers
+        return A, best_inliers
 
     def transform_image_into(self, A, img_src, img_dest, offset_x = 0, offset_y = 0):
-        hei, wid, _ = img_src.shape
+        hei, wid, dep = img_dest.shape
+        heis, wids, deps = img_src.shape
+        hei -= 2*offset_y
+        wid -= 2*offset_x
         f1 = lambda x1, y1: [x1, y1, 1, 0, 0, 0]
         f2 = lambda x1, y1: [0, 0, 0, x1, y1, 1]
-        X = np.matrix([f(x1, y1) for x1, y1 in itertools.product(range(wid), range(hei)) for f in (f1, f2)])
-        print(X)
+        #f1 = lambda x1, y1: [x1]
+        #f2 = lambda x1, y1: [y1]
+        #original image
+        X = np.matrix([f(x1, y1) for x1, y1 in itertools.product(range(-wid*2, wid*2), range(-hei*2, hei*2)) for f in (f1, f2)])
+        #print(X)
         Y = X * A
+        #print(X, Y)
+        print(A)
+        #a, b, c, d, e, f = A[0,0], A[1,0], A[2,0], A[3,0], A[4,0], A[5,0]
 
         for i in range(1, len(X), 2):
-            xd, yd = int(round(Y[i-1,0] + offset_x)), int(round(Y[i,0] + offset_y))
-            xs, ys = X[i,3], X[i,4]
-            print('xdydxsys', xd, yd, xs, ys, Y[i-1,0], Y[i,0])
-            img_dest[yd, xd, :] = img_src[ys, xs, :]
+            xd, yd = X[i,3], X[i,4]
+            q, k = yd, xd
+
+            x, y =Y[i-1,0] , Y[i,0]
+
+            #x = (-b * f + b * q + c * e - e * k)/(b * d - a * e)
+            #y = (a*(f-q) - c * d + d * k)/(b * d - a * e)
+            
+            #x, y = Y[i-1,0], Y[i,0]
+            x1, y1, x2, y2 = floor(x), floor(y), ceil(x), ceil(y)
+            if x1 >= wids or x2 >= wids or y1 >= heis or y2 >= heis or np.min([x1, x2, y1, y2]) < 0:
+                continue
+            for d in range(dep):
+                
+                #pq11, pq12, pq21, pq22 = (x1, y1), (x1, y2), (x2, y1), (x2, y2)
+                fq11, fq12, fq21, fq22 = img_src[y1, x1, d], img_src[y1, x2, d], img_src[y2, x1, d], img_src[y2, x2, d]
+                #print('fqs', fq11, fq12, fq21, fq22)
+                frac = x2 - x1
+                fxy1 = fq11
+                fxy2 = fq12
+                if frac != 0:          
+                    fxy1 = ((x2 - x)/(frac))*fq11 + ((x - x1)/(frac))*fq21
+                    fxy2 = ((x2 - x)/(frac))*fq12 + ((x - x1)/(frac))*fq22
+                
+
+                frac2 = y2-y1
+                fxy = fxy1
+                if frac2 != 0:
+                    fxy = ((y2-y)/(y2-y1))*fxy1 + ((y-y1)/(y2-y1))*fxy2
+
+                
+
+                #print(int(round(fxy)))
+                
+                img_dest[yd+offset_y, xd+offset_x, d] = int(round(fxy))
 
 
         
@@ -169,57 +213,50 @@ class ImageTransform:
         #print(des1)
         matches = self.knn_match(des1, des2)
         A, n_matches = self.ransac(kpd1, kpd2, matches)
-        dest = cv2.copyMakeBorder(img2, 500, 500, 500, 500, cv2.BORDER_CONSTANT, 0)
+        dest = cv2.copyMakeBorder(img2, 600, 600, 600, 600, cv2.BORDER_CONSTANT, 0)
         self.draw_lines_matches(kpd1, kpd2, img1, img2)
         self.draw_lines_matches_received(kpd1, kpd2, img1, img2, n_matches)
-        img_dest = self.transform_image_into(A, img1, dest, 500, 500)
+        img_dest = self.transform_image_into(A, img1, dest, 600, 600)
 
         debug('transformed_image', img_dest)
 
+    def find_and_apply_transformation_no_src(self, kpd1, kpd2, img1, img2):
+        des1 = [k[1] for k in kpd1]
+        des2 = [k[1] for k in kpd2]
+        #print(des1)
+        matches = self.knn_match(des1, des2)
+        A, n_matches = self.ransac(kpd1, kpd2, matches)
+        wid, hei, dep = img1.shape
+        dest = np.zeros((wid + 250, hei + 250, dep), np.uint8)
+        self.draw_lines_matches(kpd1, kpd2, img1, img2)
+        self.draw_lines_matches_received(kpd1, kpd2, img1, img2, n_matches)
+        img_dest = self.transform_image_into(A, img1, dest, 125, 125)
+
+        debug('transformed_image', img_dest)
+
+        return img_dest
         
+    def show_matched(self, img2, img1):
+        sift = Sift()
+        des1 = sift.get_descriptors(img1, outname='im1')
+        des2 = sift.get_descriptors(img2, outname='im2')
+        dest = self.find_and_apply_transformation_no_src(des1, des2, img1, img2)
+        debug('img_dest', dest)
+        return dest
 
-    
+    def set_first_frame(self, img2):
+        sift = Sift()
+        self.des2 = sift.get_descriptors(img2, outname='im2')
 
 
-
-
-    def _sift(self, img):
-        gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-        sift = cv2.xfeatures2d.SIFT_create()
-        kp, des = sift.detectAndCompute(gray,None)
-        
-        img=cv2.drawKeypoints(img,kp, img)
-        debug('sift', img)
-        return (kp, des)
-
-    #def _fit_model(self):
-
-    def _match(self, img1, img2):
-        kp1, des1 = self._sift(img1)
-        kp2, des2 = self._sift(img2)
-        # BFMatcher with default params
-        #bf = cv2.BFMatcher()
-        #matches = bf.knnMatch(des1,des2, k=2)
-        # Apply ratio test
-        matches = knn_match(des1,des2)
-
-        good = []
-        for m,n in matches:
-           #verify if the distance between the first and second is big enough
-           #if m.distance < 0.7*n.distance:
-           good.append(m)
-        # cv2.drawMatchesKnn expects list of lists as matches.
-        #print("kp", kp1)
-        #print("kp", kp1[1])
-        #print("des", des1)
-        #print("good", good)
-        #img3 = None
-        #img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good, img3,flags=2)
-        #return img3
-        #plt.imshow(img3),plt.show()
-        return ((kp1, des1), (kp2, des2), matches)
-
+    def show_matched_reuse(self, img2, img1):
+        sift = Sift()
+        des1 = sift.get_descriptors(img1, outname='im1')
+        dest = self.find_and_apply_transformation_no_src(des1, self.des2, img1, img2)
+        debug('img_dest', dest)
+        return dest
+     
+    """
     def show_matched(self, img2, img1):
         img1 = cv2.copyMakeBorder(img1, 100, 100, 100, 100, cv2.BORDER_CONSTANT, 0)
         img2 = cv2.copyMakeBorder(img2, 100, 100, 100, 100, cv2.BORDER_CONSTANT, 0)
@@ -253,6 +290,7 @@ class ImageTransform:
 
         #debug("matched", self._match(img1, img2))
 
+    """
 
     def __init__(self):
         #img1 = cv2.copyMakeBorder(img1, 256, 256, 512, 256, cv2.BORDER_CONSTANT, 0)
