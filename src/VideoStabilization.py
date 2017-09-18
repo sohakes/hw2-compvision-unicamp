@@ -30,11 +30,12 @@ class VideoStabilization:
                 out_frame = None
                 if first_frame is not None:
                     #first_frame is already with a border                    
-                    out_frame = transform_image.show_matched(first_frame, frame)                                                 
+                    out_frame = transform_image.show_matched_reuse(first_frame, frame)                                                 
                 else:
                     #transform_image.set_first_frame(first_frame)                     
                     out_frame = cv2.copyMakeBorder(frame, 125, 125, 125, 125, cv2.BORDER_CONSTANT, 0)
-                first_frame = frame
+                    first_frame = frame
+                    transform_image.set_first_frame(first_frame)
 
                 w, h, c = out_frame.shape
                 #fout_frame = out_frame[200:w-200,200:h-200,:]

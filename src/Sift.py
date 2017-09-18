@@ -398,7 +398,7 @@ class Sift:
                     tmp_img = cv2.circle(tmp_img,(n,m), 1, (255,255,255), 1)
 
                     #discard values lower that 0.03 as the paper says
-                    if abs(kpval) <= 0.015 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
+                    if abs(kpval) <= 0.005 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
                         #print('nope', abs(kpval) <= 0.03, kpval)
                         continue
                     #print('HERE!')
