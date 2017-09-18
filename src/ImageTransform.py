@@ -104,48 +104,49 @@ class ImageTransform:
         best_inliers = []
         #best_A = []
         iterations = 0
+        A = None
+        while A is None and iterations < n*5:
 
-        while n > iterations:
-            #print(iterations, n)
-            #find affine matrix for three points
-            selected_matches = random.sample(matches, 3)
-            Xsamp, Ysamp = self.fill_matrix_points_XY(kpd1, kpd2, selected_matches)
-            #print('xsamp, ysamp',Xsamp, Ysamp)
-            Asamp = self.find_affine_matrix(Xsamp, Ysamp)
-            #print('asamp', Asamp)
-            if Asamp is None:
-                continue
+            while n > iterations:
+                #print(iterations, n)
+                #find affine matrix for three points
+                selected_matches = random.sample(matches, 3)
+                Xsamp, Ysamp = self.fill_matrix_points_XY(kpd1, kpd2, selected_matches)
+                #print('xsamp, ysamp',Xsamp, Ysamp)
+                Asamp = self.find_affine_matrix(Xsamp, Ysamp)
+                #print('asamp', Asamp)
+                if Asamp is None:
+                    continue
 
-            #check the rest
-            Ytest = X*Asamp
-            inliers = []
-            #print('start', Asamp)
-            for i in range(1, len(Ytest), 2):
-                x1, y1 = Ytest[i-1, 0], Ytest[i, 0]
-                x2, y2 = Y[i-1,0], Y[i,0]
-                dist = math.sqrt(math.pow(x1-x2, 2) + math.pow(y1-y2, 2))
-                #print('dist', dist, x1, y1, x2, y2)
-                if dist < thresh:
-                    #print('done', (i-1)/2)
-                    inliers.append(matches[int((i-1)/2)]) #append the match
+                #check the rest
+                Ytest = X*Asamp
+                inliers = []
+                #print('start', Asamp)
+                for i in range(1, len(Ytest), 2):
+                    x1, y1 = Ytest[i-1, 0], Ytest[i, 0]
+                    x2, y2 = Y[i-1,0], Y[i,0]
+                    dist = math.sqrt(math.pow(x1-x2, 2) + math.pow(y1-y2, 2))
+                    #print('dist', dist, x1, y1, x2, y2)
+                    if dist < thresh:
+                        #print('done', (i-1)/2)
+                        inliers.append(matches[int((i-1)/2)]) #append the match
 
-            if len(inliers) > len(best_inliers):
-                best_inliers = inliers
-                #best_A = Asamp
-                w = len(inliers)/len(matches)
-                #n = np.log(1-p)/np.log(1-w**n)
-            #print('inliers, best',inliers, best_inliers)
+                if len(inliers) > len(best_inliers):
+                    best_inliers = inliers
+                    #best_A = Asamp
+                    w = len(inliers)/len(matches)
+                    #n = np.log(1-p)/np.log(1-w**n)
+                #print('inliers, best',inliers, best_inliers)
 
-            iterations += 1
+                iterations += 1
 
-        #find affine for all the inliers now
-        best_inliers2 = [((x[0][1], x[0][0]), x[1]) for x in best_inliers]
-        Xf, Yf = self.fill_matrix_points_XY(kpd2, kpd1, best_inliers2)
-        A = self.find_affine_matrix(Xf, Yf)
-        #Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
-        #A = self.find_affine_matrix(Xf, Yf)
+            #find affine for all the inliers now
+            best_inliers2 = [((x[0][1], x[0][0]), x[1]) for x in best_inliers]
+            Xf, Yf = self.fill_matrix_points_XY(kpd2, kpd1, best_inliers2)
+            A = self.find_affine_matrix(Xf, Yf)
+            #Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
+            #A = self.find_affine_matrix(Xf, Yf)
 
-        assert A is not None
 
         return A, best_inliers
 
@@ -163,7 +164,7 @@ class ImageTransform:
         #print(X)
         Y = X * A
         #print(X, Y)
-        print(A)
+        #print(A)
         #a, b, c, d, e, f = A[0,0], A[1,0], A[2,0], A[3,0], A[4,0], A[5,0]
 
         for i in range(1, len(X), 2):
@@ -226,6 +227,8 @@ class ImageTransform:
         #print(des1)
         matches = self.knn_match(des1, des2)
         A, n_matches = self.ransac(kpd1, kpd2, matches)
+        if A is None:
+            return None
         wid, hei, dep = img1.shape
         dest = np.zeros((wid + 250, hei + 250, dep), np.uint8)
         self.draw_lines_matches(kpd1, kpd2, img1, img2)
