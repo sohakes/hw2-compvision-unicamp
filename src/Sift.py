@@ -398,7 +398,7 @@ class Sift:
                     tmp_img = cv2.circle(tmp_img,(n,m), 1, (255,255,255), 1)
 
                     #discard values lower that 0.03 as the paper says
-                    if abs(kpval) <= 0.005 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
+                    if abs(kpval) <= 0.001 or self._does_discard_keypoint(current_dog_octave, s, m, n, c_edge):
                         #print('nope', abs(kpval) <= 0.03, kpval)
                         continue
                     #print('HERE!')
@@ -419,7 +419,7 @@ class Sift:
                     
     #IMPORTANT: the c_edge value is for [0,1], I think it's still ok since it's a ratio
     def get_descriptors(self, img_color, n_octaves=8, n_levels_octave=4, kernel_size=7,
-            gaussian=0.8, c_edge=10, lam=1.5, n_bins=36, threshold=0.8, lam_descr = 6, n_hist = 4, n_ori = 8, outname = 'img'):
+            gaussian=0.8, c_edge=10, lam=1.5, n_bins=36, threshold=0.8, lam_descr = 6, n_hist = 3, n_ori = 8, outname = 'img'):
         #img must be black and white
         
         img_u = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY).astype(float)/255      

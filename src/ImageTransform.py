@@ -96,9 +96,9 @@ class ImageTransform:
 
     #match is ((idx1, idx2), dist)
     def ransac(self, kpd1, kpd2, matches):
-        thresh = 5
+        thresh = 2
         p = 0.99
-        n = 2000 #infinite, or just big enough
+        n = 5000 #infinite, or just big enough
 
         X, Y = self.fill_matrix_points_XY(kpd1, kpd2, matches)
         best_inliers = []
@@ -141,11 +141,11 @@ class ImageTransform:
                 iterations += 1
 
             #find affine for all the inliers now
-            best_inliers2 = [((x[0][1], x[0][0]), x[1]) for x in best_inliers]
-            Xf, Yf = self.fill_matrix_points_XY(kpd2, kpd1, best_inliers2)
-            A = self.find_affine_matrix(Xf, Yf)
-            #Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
+            #best_inliers2 = [((x[0][1], x[0][0]), x[1]) for x in best_inliers]
+            #Xf, Yf = self.fill_matrix_points_XY(kpd2, kpd1, best_inliers2)
             #A = self.find_affine_matrix(Xf, Yf)
+            Xf, Yf = self.fill_matrix_points_XY(kpd1, kpd2, best_inliers)
+            A = self.find_affine_matrix(Xf, Yf)
 
 
         return A, best_inliers
@@ -160,7 +160,7 @@ class ImageTransform:
         #f1 = lambda x1, y1: [x1]
         #f2 = lambda x1, y1: [y1]
         #original image
-        X = np.matrix([f(x1, y1) for x1, y1 in itertools.product(range(-wid*2, wid*2), range(-hei*2, hei*2)) for f in (f1, f2)])
+        X = np.matrix([f(x1, y1) for x1, y1 in itertools.product(range(0-offset_x, wid+offset_x), range(0-offset_y, hei+offset_y)) for f in (f1, f2)])
         #print(X)
         Y = X * A
         #print(X, Y)
@@ -171,15 +171,24 @@ class ImageTransform:
             xd, yd = X[i,3], X[i,4]
             q, k = yd, xd
 
-            x, y =Y[i-1,0] , Y[i,0]
+            #x, y =Y[i-1,0] , Y[i,0]
 
             #x = (-b * f + b * q + c * e - e * k)/(b * d - a * e)
             #y = (a*(f-q) - c * d + d * k)/(b * d - a * e)
             
-            #x, y = Y[i-1,0], Y[i,0]
-            x1, y1, x2, y2 = floor(x), floor(y), ceil(x), ceil(y)
-            if x1 >= wids or x2 >= wids or y1 >= heis or y2 >= heis or np.min([x1, x2, y1, y2]) < 0:
+            x, y = Y[i-1,0], Y[i,0]
+            #x1, y1, x2, y2 = floor(x), floor(y), ceil(x), ceil(y)
+            #if x1 >= wids or x2 >= wids or y1 >= heis or y2 >= heis or np.min([x1, x2, y1, y2]) < 0:
+            #    continue
+            x, y  = int(round(x)), int(round(y))
+            #print(yd, xd, x, y)
+
+            if x <=0 or y <= 0 or x >= wids or y >= heis:
                 continue
+            p =img_src[y,x, :]
+            img_dest[yd+offset_y, xd+offset_x, :] = p
+            
+            """
             for d in range(dep):
                 
                 #pq11, pq12, pq21, pq22 = (x1, y1), (x1, y2), (x2, y1), (x2, y2)
@@ -203,7 +212,7 @@ class ImageTransform:
                 #print(int(round(fxy)))
                 
                 img_dest[yd+offset_y, xd+offset_x, d] = int(round(fxy))
-
+            """
 
         
         return img_dest
