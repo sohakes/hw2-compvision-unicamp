@@ -5,6 +5,7 @@ from ImageTransform import *
 
 class VideoStabilization:
     def __init__(self, src_video_file_path, dst_video_file_path):
+        WRITING = False
         cap = cv2.VideoCapture(src_video_file_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -73,3 +74,4 @@ class VideoStabilization:
         out.release()
         #out2.release()
         cv2.destroyAllWindows()
+        WRITING = True

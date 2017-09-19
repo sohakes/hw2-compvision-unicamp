@@ -20,7 +20,7 @@ def write_transform(path1, path2):
     des1 = sift.get_descriptors(img1)
     des2 = sift.get_descriptors(img2)
     imt = ImageTransform()
-    im = imt.find_and_apply_transformation(des1, des2, img1, img2, 400)
+    im = imt.find_and_apply_transformation(des1, des2, img1, img2, 600)
     write_image(4, im)
 
 def main():
@@ -45,13 +45,17 @@ def main():
 
     #stab = VideoStabilization('input/p2-1-13.mp4', 'output/nometempour') #or 11 for nathana, 12 for mine again
     print("First set of images on sift")
-    #write_transform('input/p2-1-7.png', 'input/p2-1-8.png')
+    write_transform('input/p2-1-0.png', 'input/p2-1-1.png')
 
     print("Second set of images on sift")
-    #write_transform('input/p2-1-1.png', 'input/p2-1-2.png')
+    write_transform('input/p2-1-2.png', 'input/p2-1-3.png')
+
+    print("Third set of images on sift")
+    write_transform('input/p2-1-4.png', 'input/p2-1-5.png')
+
 
     print("Stabilizaing video")
-    stab = VideoStabilization('input/p2-5-13.mp4', 'output/p2-5-0') #or 11 for nathana, 12 for mine again
+    stab = VideoStabilization('input/p2-5-6.mp4', 'output/p2-5-0') #or 11 for nathana, 12 for mine again
     
     """
     des1 = None
