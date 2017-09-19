@@ -5,7 +5,6 @@ from ImageTransform import *
 
 class VideoStabilization:
     def __init__(self, src_video_file_path, dst_video_file_path):
-        WRITING = False
         cap = cv2.VideoCapture(src_video_file_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -14,12 +13,9 @@ class VideoStabilization:
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) + 0  # float
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) + 0# float
         length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        #print('width, height', width, height)
         out = cv2.VideoWriter(dst_video_file_path + '.avi',fourcc, fps, (width,height))
-        #out2 = cv2.VideoWriter(dst_video_file_path + 'unfix.avi',fourcc, fps, (width-0,height-0))
-        #print('fps', fps)
 
-        transform_image = ImageTransform()
+        transform_image = ImageTransform(False)
         it = 0
         first_frame = None
         print("Skipping first 30 frames...")
@@ -34,10 +30,8 @@ class VideoStabilization:
 
                 print("frame", it-30, "of", length-30, ', %.2f %%' % (100*((it-30)/(length-30))))
                 
-                #print('got in', it)
                 out_frame = None
                 if first_frame is not None:
-                    #print('if')
                     #first_frame is already with a border     
                     newframe = first_frame.copy()               
                     out_frame = transform_image.show_matched_reuse(newframe, frame)
@@ -45,9 +39,6 @@ class VideoStabilization:
                         print("skipping frame")
                         continue                                                 
                 else:
-                    #print('else')
-                    #transform_image.set_first_frame(first_frame)                     
-                    #out_frame = cv2.copyMakeBorder(frame, 125, 125, 125, 125, cv2.BORDER_CONSTANT, 0)
                     out_frame = frame.copy()
                     first_frame = frame.copy()
                     new_frame = frame
@@ -57,21 +48,11 @@ class VideoStabilization:
                 debug('out frame', out_frame)
 
                 w, h, c = out_frame.shape
-                #fout_frame = out_frame[200:w-200,200:h-200,:]
-               #print('shapes outframe, frame', out_frame.shape, frame.shape, width+250, height+250)
-                # write the flipped frame
                 out.write(out_frame)
-                #out2.write(frame)
-
-                #cv2.imshow('out_frame',fout_frame)
-                #if cv2.waitKey(1) & 0xFF == ord('q'):
-                #    break
             else:
                 break
 
         # Release everything if job is finished
         cap.release()
         out.release()
-        #out2.release()
         cv2.destroyAllWindows()
-        WRITING = True

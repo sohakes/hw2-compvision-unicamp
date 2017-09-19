@@ -8,12 +8,12 @@ import math
 ############################################
 
 DEBUG = False
-WRITING = True
 NUMBER_FILE = -1
 QUESTION = [0, 0, 0, 0]
 
-def write_image(question, img):
-    if WRITING:
+
+def write_image(question, img, save):
+    if save:
         cv2.imwrite('output/p2-'+str(question)+'-'+str(QUESTION[question-1]) + '.png', img)
         QUESTION[question-1] += 1
 
